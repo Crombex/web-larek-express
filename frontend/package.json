@@ -2,8 +2,8 @@
   "name": "weblarek_frontend",
   "private": true,
   "version": "1.0.0",
-  "description": "< Добавьте описание проекта в свободной форме >",
-  "author": "< Укажите здесь автора работы >",
+  "description": "Добавил описание проекта в свободной форме",
+  "author": "Crombex",
   "type": "module",
   "scripts": {
     "dev": "vite",
