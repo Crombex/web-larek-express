@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import Joi from 'joi';
 import BadRequestError from '../errors/bad-request-error';
 import { IOrder } from '../controllers/order';
@@ -64,7 +65,7 @@ const validateOrder = async (req: Request<{}, {}, IOrder>, _res: Response, next:
     const productsFromDB = await Product.find({ _id: { $in: uniqueIds } });
 
     if (productsFromDB.length !== uniqueIds.length) {
-      throw new Error('Some products are not found in the database');
+      throw new BadRequestError('Some products are not found in the database');
     }
 
     let calculatedTotal = 0;
@@ -83,7 +84,10 @@ const validateOrder = async (req: Request<{}, {}, IOrder>, _res: Response, next:
 
     next();
   } catch (error) {
-    next(error);
+    if (error instanceof mongoose.Error.CastError && error.kind === 'ObjectId') {
+      return next(new BadRequestError('Invalid product ID format'));
+    }
+    return next(error);
   }
 };
 
