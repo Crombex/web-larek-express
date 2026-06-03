@@ -5,7 +5,14 @@ import { IOrder } from '../controllers/order';
 import Product from '../models/product';
 
 const orderBodySchema = Joi.object().keys({
-  items: Joi.array().items(Joi.string()).min(1).required()
+  items: Joi.array()
+    .items(
+      Joi.string()
+        .pattern(/^[0-9a-fA-F]{24}$/)
+        .message('Each item must be a valid mongoDB ObjectId string'),
+    )
+    .min(1)
+    .required()
     .messages({
       'array.min': 'array of items must contain at least one product ID',
       'any.required': 'field "items" is required',
@@ -42,7 +49,7 @@ const validateOrder = async (req: Request<{}, {}, IOrder>, _res: Response, next:
     if (error) {
       const errorMessage = error.details.map((detail) => detail.message).join(', ');
 
-      throw new BadRequestError(`Data validation error when creating a product: ${errorMessage}`);
+      throw new BadRequestError(`Data validation error when creating a order: ${errorMessage}`);
     }
 
     const { items, total } = value;
@@ -57,19 +64,18 @@ const validateOrder = async (req: Request<{}, {}, IOrder>, _res: Response, next:
     const productsFromDB = await Product.find({ _id: { $in: uniqueIds } });
 
     if (productsFromDB.length !== uniqueIds.length) {
-      throw new BadRequestError('Some products are not found in the database');
+      throw new Error('Some products are not found in the database');
     }
 
     let calculatedTotal = 0;
 
-    for (const product of productsFromDB) {
+    productsFromDB.forEach((product) => {
       if (product.price === null) {
         throw new BadRequestError(`Product "${product.title}" is temporarily unavailable`);
       }
-
       const quantity = itemsCountMap[product._id.toString()];
       calculatedTotal += product.price * quantity;
-    }
+    });
 
     if (calculatedTotal !== total) {
       throw new BadRequestError('Final amount does not match');

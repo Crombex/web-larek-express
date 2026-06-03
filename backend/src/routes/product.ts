@@ -7,4 +7,4 @@ const route = Router();
 route.get('/', getAllProducts);
 route.post('/', validateProduct, createProduct);
 
-export { route as productRoutes };
+export default route;

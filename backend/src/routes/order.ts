@@ -5,4 +5,5 @@ import validateOrder from '../middlewares/order-validation';
 const route = Router();
 
 route.post('/', validateOrder, createOrder);
-export { route as orderRoutes };
+
+export default route;

@@ -3,19 +3,25 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import { PORT, DB_ADDRESS } from './config';
 import path from 'path';
-import { productRoutes, orderRoutes } from './routes';
-import { notFoundHandler } from './middlewares/not-found-handler';
+import productRoutes from './routes/product';
+import orderRoutes from './routes/order';
+import notFoundHandler from './middlewares/not-found-handler';
 import errorHandler from './middlewares/error-handler';
 import { requestLogger, errorLogger } from './middlewares/logger';
 
 const app = express();
 
 async function bootstrap() {
-  mongoose.connect(DB_ADDRESS);
+  try {
+    await mongoose.connect(DB_ADDRESS, { serverSelectionTimeoutMS: 5000 });
 
-  app.listen(PORT, () => {
-    console.log(`Server is working on port ${PORT}`);
-  });
+    app.listen(PORT, () => {
+      console.log(`Server is working on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to connect to the database:', error);
+    process.exit(1);
+  }
 }
 
 bootstrap();
