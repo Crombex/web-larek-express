@@ -82,7 +82,7 @@ const validateOrder = async (req: Request<{}, {}, IOrder>, _res: Response, next:
       throw new BadRequestError('Final amount does not match');
     }
 
-    next();
+    return next();
   } catch (error) {
     if (error instanceof mongoose.Error.CastError && error.kind === 'ObjectId') {
       return next(new BadRequestError('Invalid product ID format'));
