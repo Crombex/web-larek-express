@@ -15,6 +15,7 @@ export type ApiListResponse<Type> = {
 };
 
  type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
+ 
  class Api {
 	readonly baseUrl: string;
 	protected options: RequestInit;
